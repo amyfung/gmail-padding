@@ -1,6 +1,6 @@
-// content.js
 console.log("Gmail Padding Enhancer extension loaded");
 
+// Selects the email cards and adds padding to each card.
 function addPaddingToEmailCards() {
   // Select both types of email cards
   const cards = document.querySelectorAll('tr.zA.yO, tr.zA.zE');
