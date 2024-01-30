@@ -1,28 +1,16 @@
-console.log("Gmail Padding Enhancer extension loaded");
-
 /**
- * A function to be called when a message is received. The function is passed 
- * the following parameters:
- * request (Object): Contains data sent in the message.
- * sender (Object): Provides information about the sender of the message.
- * sendResponse (Function): A function to send a response back to the message 
- * sender.
+ * Adds padding to email cards and listens for messages with updated padding
+ * values from the popup.
  */
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.padding) {
-    addPaddingToEmailCards(request.padding);
-  }
-});
 
 /**
- * Applies the specified padding value to each email card. If no value is 
- * specified, a default value is used.
- * 
- * @param {String} [paddingValue='10'] - The padding value to be applied to the 
+ * Applies the given padding value to the email cards.
+ * @param {String} paddingValue - The padding value to be applied to the 
  * email cards. Defaults to '10' if not specified.
+ * @returns 
  */
-function addPaddingToEmailCards(paddingValue = '10') { 
-  const cards = document.querySelectorAll('tr.zA.yO, tr.zA.zE');
+function addPaddingToEmailCards(paddingValue) { 
+  const cards = document.querySelectorAll('tr.zA.yO, tr.zA.zE, tr.xS');
   if (!cards.length) {
     console.log("No email cards found. Retrying...");
     setTimeout(() => addPaddingToEmailCards(paddingValue), 1000);
@@ -34,12 +22,39 @@ function addPaddingToEmailCards(paddingValue = '10') {
   });
 }
 
-// Observe for changes in the DOM as Gmail loads emails dynamically
+/**
+ * Fetches the stored padding value if available and otherwise uses the default 
+ * value. 
+ */ 
+function fetchAndApplyPadding() {
+  chrome.runtime.sendMessage({ action: "getPadding" }, (response) => {
+    addPaddingToEmailCards(response.paddingValue || '10');
+  });
+}
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.padding) {
+    addPaddingToEmailCards(request.padding);
+  }
+});
+
+// Listener for messages from the popup
+/* chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.padding) {
+    chrome.storage.local.set({ 'paddingValue': request.padding }, function() {
+      fetchAndApplyPadding();
+    });
+  }
+}); */
+
+/**
+ * Observe for changes in the DOM as Gmail loads emails dynamically. Ensures 
+ * that padding persists across pages of emails.
+ */
 const observer = new MutationObserver((mutations) => {
   mutations.forEach(mutation => {
     if (mutation.type === 'childList') {
-      addPaddingToEmailCards();
+      fetchAndApplyPadding();
     }
   });
 });
@@ -48,5 +63,5 @@ const observer = new MutationObserver((mutations) => {
 const config = { childList: true, subtree: true };
 observer.observe(document, config);
 
-// Call initially in case the DOM is already loaded
-addPaddingToEmailCards();
+// Initial call to fetch and apply padding
+fetchAndApplyPadding();

@@ -3,7 +3,11 @@
     "name": "Gmail Padding Enhancer",
     "version": "1.0.1",
     "description": "Add padding to email cards in Gmail's inbox view",
-    "permissions": ["activeTab", "scripting"],
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "storage" 
+    ],
     "host_permissions": ["*://mail.google.com/*"],
     "content_scripts": [
       {

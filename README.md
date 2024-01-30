@@ -1,5 +1,8 @@
 # README: Chrome-Based Browser Extension to Add Vertical Padding to Gmail Cards
 
+A very simple extension for adding and customizing the vertical padding in 
+Gmail's inbox email cards. 
+
 ## Installation Steps
 
 ### Step 1: Download the Extension
